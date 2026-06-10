@@ -322,7 +322,11 @@
   animate();
 
   /* ── VÉRIFICATION RÉPONSE ── */
-  const ACCEPTED = ['la lettre n', 'n', 'la lettre "n"', "la lettre n", 'lettre n'];
+const ACCEPTED = [
+  'n', 'la lettre n', 'lettre n', 'la lettre "n"',
+  'nuit', 'la nuit', 'la lettre n.', 'n.',
+  'la lettre', 'une lettre', 'le n'
+];
 
   function checkAnswer() {
     const raw = document.getElementById('answer-input').value.trim().toLowerCase();
