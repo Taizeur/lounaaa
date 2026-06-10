@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pour Louna 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:    #e8a0b4;
+      --rose-deep: #c96c8a;
+      --cream:   #fff5f8;
+      --dark:    #2d1a22;
+      --gold:    #d4a96a;
+      --white:   #ffffff;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── PÉTALES ── */
+    #petals-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── ENIGME ── */
+    #enigme-section {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(232,160,180,0.4);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 8px 40px rgba(201,108,138,0.15);
+    }
+
+    .card .eyebrow {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--rose-deep);
+      margin-bottom: 1.2rem;
+    }
+
+    .card h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.25;
+      margin-bottom: 0.8rem;
+    }
+
+    .card .subtitle {
+      font-size: 0.92rem;
+      color: #7a4a5a;
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .enigme-box {
+      background: linear-gradient(135deg, #fce4ec, #fdf0f5);
+      border-left: 3px solid var(--rose-deep);
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.8rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.85rem 1.2rem;
+      border: 1.5px solid var(--rose);
+      border-radius: 50px;
+      font-family: 'Lato', sans-serif;
+      font-size: 1rem;
+      color: var(--dark);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    input[type="text"]:focus {
+      border-color: var(--rose-deep);
+      box-shadow: 0 0 0 3px rgba(201,108,138,0.15);
+    }
+    input[type="text"].error {
+      border-color: #e57373;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      25%{transform:translateX(-6px)}
+      75%{transform:translateX(6px)}
+    }
+
+    .btn-submit {
+      display: inline-block;
+      padding: 0.85rem 2.2rem;
+      background: linear-gradient(135deg, var(--rose-deep), #a0415e);
+      color: var(--white);
+      border: none;
+      border-radius: 50px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(201,108,138,0.35);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(201,108,138,0.45); }
+    .btn-submit:active { transform: translateY(0); }
+
+    #error-msg {
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      min-height: 1.2em;
+    }
+
+    /* ── REVEAL ── */
+    #reveal-section {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--dark);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem;
+    }
+    #reveal-section.active { display: flex; }
+
+    .reveal-inner { position: relative; z-index: 2; }
+
+    .heart-burst {
+      font-size: 5rem;
+      animation: heartbeat 1.2s ease infinite;
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+    @keyframes heartbeat {
+      0%,100%{transform:scale(1)}
+      14%{transform:scale(1.2)}
+      28%{transform:scale(1)}
+      42%{transform:scale(1.15)}
+      70%{transform:scale(1)}
+    }
+
+    .reveal-msg {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 8vw, 5rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+    .reveal-msg span {
+      color: var(--rose);
+    }
+
+    .reveal-sub {
+      margin-top: 1.2rem;
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.04em;
+    }
+
+    /* stars background on reveal */
+    #stars {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+      opacity: 0;
+    }
+    @keyframes twinkle {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 0.85; transform: scale(1.2); }
+    }
+
+    @media(max-width:480px){
+      .card { padding: 2rem 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- canvas pétales -->
+<canvas id="petals-canvas"></canvas>
+
+<!-- SECTION ENIGME -->
+<section id="enigme-section">
+  <div class="card">
+    <p class="eyebrow">Un message pour toi ✉️</p>
+    <h1>Louna, réponds à l'énigme</h1>
+    <p class="subtitle">Si tu trouves la réponse, un secret t'attend de l'autre côté…</p>
+
+    <div class="enigme-box">
+      « Je commence la nuit, je finis le matin,<br>
+      je suis dans l'amour mais pas dans le destin.<br>
+      Qui suis-je ? »
+    </div>
+
+    <input type="text" id="answer-input" placeholder="Ta réponse…" autocomplete="off" />
+    <br/>
+    <button class="btn-submit" onclick="checkAnswer()">Découvrir ✨</button>
+    <p id="error-msg"></p>
+  </div>
+</section>
+
+<!-- SECTION RÉVÉLATION -->
+<section id="reveal-section">
+  <div id="stars"></div>
+  <div class="reveal-inner">
+    <span class="heart-burst">❤️</span>
+    <p class="reveal-msg">Je t'aime<br><span>Louna</span></p>
+    <p class="reveal-sub">pour toujours &amp; encore plus</p>
+  </div>
+</section>
+
+<script>
+  /* ── PÉTALES TOMBANTS ── */
+  const canvas = document.getElementById('petals-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#e8a0b4','#f5c6d6','#c96c8a','#fbd0df','#d47c97'];
+  const petals = Array.from({length: 28}, () => makePetal());
+
+  function makePetal(fresh) {
+    const y = fresh ? -20 : Math.random() * window.innerHeight;
+    return {
+      x: Math.random() * window.innerWidth,
+      y,
+      r: 6 + Math.random() * 8,
+      speed: 0.6 + Math.random() * 1.2,
+      drift: (Math.random() - 0.5) * 0.6,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.04,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      opacity: 0.4 + Math.random() * 0.5
+    };
+  }
+
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.r, p.r * 1.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    petals.forEach(p => {
+      p.y += p.speed;
+      p.x += p.drift;
+      p.rot += p.rotSpeed;
+      if (p.y > canvas.height + 20) {
+        Object.assign(p, makePetal(true));
+        p.x = Math.random() * canvas.width;
+      }
+      drawPetal(p);
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  /* ── VÉRIFICATION RÉPONSE ── */
+  const ACCEPTED = ['la lettre n', 'n', 'la lettre "n"', "la lettre n", 'lettre n'];
+
+  function checkAnswer() {
+    const raw = document.getElementById('answer-input').value.trim().toLowerCase();
+    const input = document.getElementById('answer-input');
+    const err = document.getElementById('error-msg');
+
+    if (!raw) { err.textContent = 'Écris ta réponse d'abord 😊'; return; }
+
+    if (ACCEPTED.includes(raw)) {
+      err.textContent = '';
+      showReveal();
+    } else {
+      input.classList.add('error');
+      err.textContent = 'Pas tout à fait… réfléchis encore un peu 💭';
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  document.getElementById('answer-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  /* ── RÉVÉLATION ── */
+  function showReveal() {
+    const section = document.getElementById('reveal-section');
+    section.classList.add('active');
+    buildStars();
+    launchConfetti();
+  }
+
+  function buildStars() {
+    const container = document.getElementById('stars');
+    container.innerHTML = '';
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = 1 + Math.random() * 3;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*100}%;
+        left:${Math.random()*100}%;
+        --d:${1.5 + Math.random()*3}s;
+        animation-delay:${Math.random()*3}s;
+      `;
+      container.appendChild(s);
+    }
+  }
+
+  function launchConfetti() {
+    const colors = ['#e8a0b4','#ffd700','#fff','#c96c8a','#f9c6d6'];
+    const pieces = [];
+    for (let i = 0; i < 120; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * 200,
+        w: 6 + Math.random() * 8,
+        h: 4 + Math.random() * 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: 2 + Math.random() * 4,
+        drift: (Math.random() - 0.5) * 2,
+        rot: Math.random() * Math.PI * 2,
+        rotS: (Math.random() - 0.5) * 0.15,
+        opacity: 0.7 + Math.random() * 0.3
+      });
+    }
+
+    let frame = 0;
+    function dropConfetti() {
+      if (frame > 220) { ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      petals.forEach(p => drawPetal(p)); // keep petals visible
+      pieces.forEach(p => {
+        p.y += p.speed;
+        p.x += p.drift;
+        p.rot += p.rotS;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      frame++;
+      requestAnimationFrame(dropConfetti);
+    }
+    dropConfetti();
+  }
+</script>
+</body>
+</html>
